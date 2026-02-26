@@ -1,0 +1,1 @@
+<text x="16985.46482630003" y="-1926.763682252703" fill="#FFFFFF" font-size="1.5">CTO-ETA-0455</text>

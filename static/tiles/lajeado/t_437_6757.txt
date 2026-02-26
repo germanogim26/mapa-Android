@@ -1,0 +1,2 @@
+<text x="218511.2517491679" y="3378676.181633402" fill="#FFFFFF" font-size="1.5">CTO-LJO-1130-I</text>
+<text x="218511.2517491679" y="3378582.962334095" fill="#FFFFFF" font-size="1.5">CTO-LJO-1131-I</text>

@@ -1,0 +1,1 @@
+<text x="12888.69229602022" y="1094.585965283675" fill="#FFFFFF" font-size="1.5">JJ Refeições</text>

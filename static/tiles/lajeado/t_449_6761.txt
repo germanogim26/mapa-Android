@@ -1,0 +1,9 @@
+<text x="224928.5526671289" y="3380806.123918614" fill="#FFFFFF" font-size="2.275830030441284">Essa CEO na verdade tem um coto com a caixa da BeW</text>
+<text x="224928.5526671289" y="3380802.280405114" fill="#FFFFFF" font-size="2.275830030441284">F1 coto vs F6 Talini</text>
+<text x="224928.552667129" y="3380799.253491227" fill="#FFFFFF" font-size="2.275830030441284">F2 coto vs F7 Talini</text>
+<text x="224928.552667129" y="3380796.253491205" fill="#FFFFFF" font-size="2.275830030441284">F3 coto vs F8 Talini</text>
+<text x="224928.5526671291" y="3380793.253491262" fill="#FFFFFF" font-size="2.275830030441284">F4 coto vs F9 Talini</text>
+<text x="224928.5526671291" y="3380790.25349123" fill="#FFFFFF" font-size="2.275830030441284">F5 coto vs F10 Talini</text>
+<text x="224928.5526671292" y="3380787.253491243" fill="#FFFFFF" font-size="2.275830030441284">F6 coto vs F11 Talini</text>
+<text x="224928.5526671293" y="3380784.253491171" fill="#FFFFFF" font-size="2.275830030441284">F7 coto vs F12 Talini</text>
+<text x="224928.5526671293" y="3380781.22657722" fill="#FFFFFF" font-size="2.275830030441284">F9 coto vs F5 Talini </text>

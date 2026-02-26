@@ -1,0 +1,2 @@
+<text x="220494.1109566106" y="3373842.103964533" fill="#FF0000" font-size="1.501363635063171">UBS Moinhos (CANCELADO)</text>
+<text x="220483.1659773343" y="3373845.570850279" fill="#FF0000" font-size="1.501363635063171">Praça Moinhos Academia (CANCELADO)</text>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LAB - Mapa Telecom</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="/static/lib/leaflet/leaflet.css?v=2026" />
+    <link rel="stylesheet" href="/static/lib/L.Control.Locate.min.css?v=2026" />
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #map { height: 100vh; width: 100vw; background: #fff; }
+        .search-box { position: absolute; bottom: 40px; left: 10px; right: 10px; z-index: 1000; display: flex; gap: 5px; }
+        input#campoBusca { flex: 1; padding: 15px; border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 18px; outline: none; }
+        .btn-busca { background: #d9534f; color: white; border: none; padding: 0 20px; border-radius: 12px; font-weight: bold; }
+        .leaflet-bottom { padding-bottom: 100px; }
+        .btn-pop { width:100%; padding:15px; margin-top:10px; color:white; border:none; border-radius:8px; font-weight:bold; display:block; text-align:center; text-decoration:none; font-size: 16px; background:#d9534f; }
+    </style>
+</head>
+<body>
+    <div class="search-box">
+        <input type="text" id="campoBusca" placeholder="LAB: Buscar CTO/CEO..." onkeypress="if(event.key==='Enter') buscarEquipamento(this.value)">
+        <button class="btn-busca" onclick="buscarEquipamento(document.getElementById('campoBusca').value)">OK</button>
+    </div>
+    <div id="map"></div>
+    <script src="/static/lib/leaflet/leaflet.js?v=2026"></script>
+    <script src="/static/lib/L.Control.Locate.min.js?v=2026"></script>
+    <script>
+        // OTIMIZAÇÃO 1: preferCanvas=true joga o peso dos equipamentos para a placa de vídeo
+        var map = L.map('map', { 
+            zoomControl: false,
+            preferCanvas: true 
+        }).setView([-29.46, -51.96], 13);
+        
+        // OTIMIZAÇÃO 2: Regras de Cache para evitar engasgos ao arrastar
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            keepBuffer: 8,
+            updateWhenZooming: false,
+            updateWhenIdle: true
+        }).addTo(map);
+
+        var lc = L.control.locate({ setView: 'untilPanOrZoom', flyTo: true, position: 'bottomright' }).addTo(map);
+        
+        var camadaRede;
+        fetch('/static/rede.json?v=2026').then(res => res.json()).then(data => {
+            camadaRede = L.geoJSON(data, {
+                style: function(f) { if(f.properties.tipo==="linha") return {color:"#3dfc03", weight:3}; },
+                pointToLayer: function(f, ll) {
+                    var isCTO = f.properties.name.includes("CTO");
+                    // OTIMIZAÇÃO 3: L.circleMarker (desenho nativo) substitui as Divs HTML pesadas
+                    return L.circleMarker(ll, {
+                        radius: isCTO ? 7 : 5,
+                        fillColor: isCTO ? "#ffff00" : "#ff0000",
+                        color: "#000",
+                        weight: 1,
+                        opacity: 1,
+                        fillOpacity: 0.9
+                    });
+                },
+                onEachFeature: function(f, l) {
+                    var nome = f.properties.name;
+                    var lon = f.geometry.coordinates[0];
+                    var lat = f.geometry.coordinates[1];
+                    var mapsUrl = "https://www.google.com/maps?q=" + lat + "," + lon;
+                    var zapUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent("📍 Localização " + nome + ": " + mapsUrl);
+                    var multifilar = "/multifilar?foco=" + encodeURIComponent(nome);
+                    
+                    var html = "<div style='min-width:180px;'><b style='color:red;'>TESTE: "+nome+"</b>" +
+                               "<a href='"+multifilar+"' class='btn-pop'>ABRIR LAB INFINITO</a>" +
+                               "<a href='"+mapsUrl+"' target='_blank' class='btn-pop' style='background:#3498db; margin-top:5px;'>🗺️ GOOGLE MAPS</a>" +
+                               "<a href='"+zapUrl+"' target='_blank' class='btn-pop' style='background:#25d366; margin-top:5px;'>📲 ENVIAR NO ZAP</a></div>";
+                    l.bindPopup(html);
+                }
+            }).addTo(map);
+        });
+        function buscarEquipamento(t) {
+            if(!t || !camadaRede) return;
+            lc.stop(); t = t.toUpperCase().trim(); var encontrado = false;
+            camadaRede.eachLayer(function(l) {
+                if(!encontrado && l.feature.properties.name.toUpperCase() === t) {
+                    map.setView(l.getLatLng(), 18); l.openPopup(); encontrado = true;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

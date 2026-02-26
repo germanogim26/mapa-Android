@@ -1,0 +1,1 @@
+<text x="209511.8780174839" y="3378478.702189053" fill="#FFFFFF" font-size="1.5">CAIXA DE CLIENTE\P</text>

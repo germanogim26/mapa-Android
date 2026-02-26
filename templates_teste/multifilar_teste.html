@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    /* Barra fixada no BOTTOM */
+    .top-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 80px; background: rgba(20,20,20,0.95); backdrop-filter: blur(10px); z-index: 10000; display: flex; align-items: center; padding: 0 15px 20px 15px; box-sizing: border-box; border-top: 1px solid #333; }
+    .btn-voltar { background: #333; color: white; border: none; padding: 12px 12px; border-radius: 8px; font-weight: bold; margin-right: 10px; font-size: 14px; }
+    .search-box { flex-grow: 1; display: flex; background: #444; border-radius: 8px; padding: 4px; }
+    .search-box input { background: transparent; border: none; color: white; flex-grow: 1; padding: 10px; outline: none; font-size: 16px; }
+    .btn-ir { background: #007AFF; color: white; border: none; border-radius: 6px; padding: 5px 15px; font-weight: bold; }
+    body { padding-bottom: 80px !important; margin: 0; background: #000; overflow: hidden; touch-action: none; font-family: sans-serif; }
+    
+    #cont-svg { width: 100vw; height: 100vh; }
+    path { vector-effect: non-scaling-stroke; stroke-width: 2px; }
+    text { font-family: Arial; font-weight: bold; fill: #fff; pointer-events: none; }
+    
+    #debug { 
+        position: absolute; top: 40px; left: 10px; right: 10px; 
+        background: rgba(0,0,0,0.8); color: #0f0; padding: 10px; 
+        font-size: 11px; border-radius: 8px; z-index: 1000;
+        pointer-events: none; border: 1px solid #0f0;
+    }
+    @keyframes piscar {
+        0% { opacity: 1; stroke-width: 3; }
+        50% { opacity: 0.3; stroke-width: 6; }
+        100% { opacity: 1; stroke-width: 3; }
+    }
+    .alvo-cto { fill: rgba(0, 255, 0, 0.2); stroke: #0f0; vector-effect: non-scaling-stroke; animation: piscar 1s infinite ease-in-out; }
+</style>
+<script src="/static/lib/svg-pan-zoom.min.js"></script>
+<script src="/static/lib/hammer.min.js"></script>
+</head>
+<body>
+<div class="top-bar">
+    <button class="btn-voltar" onclick="window.location.href='/'"> < Voltar </button>
+    <div class="search-box">
+        <input type="text" id="inputBusca" placeholder="Buscar CTO..." onkeypress="if(event.key==='Enter') buscarNovo()">
+        <button class="btn-ir" onclick="buscarNovo()">Ir</button>
+    </div>
+</div>
+<script>
+    function buscarNovo() {
+        var foco = document.getElementById('inputBusca').value.trim().toUpperCase();
+        if(foco) window.location.href = "/multifilar?foco=" + foco;
+    }
+</script>
+
+    <div id="debug">Aguardando coordenadas...</div>
+    <div id="cont-svg"></div>
+
+    <script>
+        let cidadeAtiva = "";
+        let carregados = new Set();
+        let svgInst = null;
+        const GRID = 500;
+        const debug = document.getElementById('debug');
+
+        function log(msg) { debug.innerText = msg; }
+
+        function carregarTile(tx, ty) {
+            const id = `${tx}_${ty}`;
+            if (carregados.has(id)) return;
+            carregados.add(id);
+
+            fetch(`/api/tiles_infinito?cidade=${cidadeAtiva}&tx=${tx}&ty=${ty}`)
+                .then(r => r.json())
+                .then(d => {
+                    if (d.svg) {
+                        const vport = document.getElementById('camada-movel');
+                        vport.insertAdjacentHTML('beforeend', `<g id="tile-${id}">${d.svg}</g>`);
+                        log(`✅ Tiles: ${carregados.size} | Local: ${tx},${ty}`);
+                    }
+                });
+        }
+
+        function atualizar() {
+            if (!svgInst) return;
+            const sizes = svgInst.getSizes();
+            const pan = svgInst.getPan();
+            const zoom = sizes.realZoom;
+
+            const xMin = (0 - pan.x) / zoom;
+            const yMin = (0 - pan.y) / zoom;
+            const xMax = (sizes.width - pan.x) / zoom;
+            const yMax = (sizes.height - pan.y) / zoom;
+
+            for (let x = Math.floor(xMin/GRID)-1; x <= Math.ceil(xMax/GRID)+1; x++) {
+                for (let y = Math.floor(yMin/GRID)-1; y <= Math.ceil(yMax/GRID)+1; y++) {
+                    carregarTile(x, y);
+                }
+            }
+        }
+
+        const foco = new URLSearchParams(window.location.search).get('foco');
+
+        fetch(`/api/tiles?foco=${foco}`)
+            .then(r => r.json())
+            .then(d => {
+                cidadeAtiva = d.cidade;
+                const container = document.getElementById('cont-svg');
+                
+                container.innerHTML = `
+                    <svg id="s" style="width:100%;height:100%">
+                        <g id="camada-movel">
+                            <rect class="alvo-cto" x="${d.x - 25}" y="${d.y - 25}" width="50" height="50" />
+                            <text x="${d.x}" y="${d.y - 35}" fill="#0f0" font-size="12" text-anchor="middle">ALVO: ${foco}</text>
+                        </g>
+                    </svg>`;
+                
+                log(`🎯 Alvo Travado em: ${d.x.toFixed(0)}, ${d.y.toFixed(0)}`);
+
+                setTimeout(() => {
+                    var eventsHandler = {
+                        haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance, initialScale = 1, pannedX = 0, pannedY = 0;
+                            this.hammer = Hammer(options.svgElement, { inputClass: Hammer.TouchInput });
+                            this.hammer.get('pinch').set({ enable: true });
+
+                            this.hammer.on('pinchstart', function(ev) { initialScale = instance.getZoom(); });
+                            this.hammer.on('pinchmove', function(ev) {
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev) {
+                                if (ev.type === 'panstart') { pannedX = 0; pannedY = 0; }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('doubletap', function(ev) { instance.zoomIn(); });
+
+                            options.svgElement.addEventListener('touchmove', function(e) { e.preventDefault(); }, {passive: false});
+                        },
+                        destroy: function() { this.hammer.destroy(); }
+                    };
+
+                    svgInst = svgPanZoom('#s', {
+                        viewportSelector: '#camada-movel',
+                        customEventsHandler: eventsHandler,
+                        zoomEnabled: true,
+                        controlIconsEnabled: false,
+                        fit: false, 
+                        center: false,
+                        maxZoom: 100,
+                        onPan: atualizar,
+                        onZoom: atualizar
+                    });
+                    
+                    const z = svgInst.getSizes().realZoom;
+                    svgInst.pan({
+                        x: (window.innerWidth / 2) - (d.x * z),
+                        y: (window.innerHeight / 2) - (d.y * z)
+                    });
+
+                    atualizar();
+                }, 300);
+            })
+            .catch(e => log("❌ Erro ao buscar equipamento."));
+    </script>
+</body>
+</html>
