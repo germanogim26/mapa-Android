@@ -5,6 +5,7 @@
     
     <application 
         android:label="FibraApp" 
+        android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
         <activity 
             android:name=".MainActivity" 
