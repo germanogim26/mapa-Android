@@ -46,10 +46,7 @@ jobs:
         
     - name: Gerar App Android
       working-directory: ./android
-      run: |
-        # A MÁGICA AQUI: Trava a versão no 7.6.3 para não bugar com o Gradle 9 do Ubuntu
-        gradle wrapper --gradle-version 7.6.3
-        ./gradlew assembleDebug
+      run: gradle assembleDebug
         
     - name: Guardar Instalador Final
       uses: actions/upload-artifact@v4
