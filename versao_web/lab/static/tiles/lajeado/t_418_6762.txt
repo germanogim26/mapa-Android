@@ -1,0 +1,1 @@
+<text x="209014.953967921" y="3381089.768181265" fill="#FFFFFF" font-size="1.5">CTO-LJO-1043</text>

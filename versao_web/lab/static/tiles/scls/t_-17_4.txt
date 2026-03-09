@@ -1,0 +1,8 @@
+<text x="-8040.726469179579" y="2019.92414047356" fill="#FFFFFF" font-size="1.5">CEO</text>
+<text x="-8119.727803651534" y="2094.268872995634" fill="#FFFFFF" font-size="1.5">Cliente</text>
+<text x="-8114.966654678421" y="2094.268872995634" fill="#FFFFFF" font-size="1.5">Cliente</text>
+<text x="-8110.205505705308" y="2094.268872995634" fill="#FFFFFF" font-size="1.5">Cliente</text>
+<text x="-8105.444356732194" y="2094.268872995634" fill="#FFFFFF" font-size="1.5">Cliente</text>
+<text x="-8100.683207759081" y="2094.268872995634" fill="#FFFFFF" font-size="1.5">Cliente</text>
+<text x="-8484.98001663131" y="2006.925413557416" fill="#FFFFFF" font-size="1.5">Cliente</text>
+<text x="-8484.98001663131" y="2011.713850352091" fill="#FFFFFF" font-size="1.5">Cliente</text>

@@ -1,0 +1,4 @@
+<text x="227242.7612620787" y="3380197.842161223" fill="#FFFFFF" font-size="38.13705825805664">13</text>
+<text x="227289.6244678205" y="3380083.404711615" fill="#FFFFFF" font-size="38.13705825805664">20</text>
+<text x="227475.7354342159" y="3380490.427534512" fill="#FFFFFF" font-size="1.5">CTO-LJO-0096</text>
+<text x="227387.9377596634" y="3380490.42753451" fill="#FFFFFF" font-size="1.5">CTO-LJO-0097</text>

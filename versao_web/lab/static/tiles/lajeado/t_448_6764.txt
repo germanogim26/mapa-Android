@@ -1,0 +1,1 @@
+<text x="224007.06516073" y="3382020.296370741" fill="#FFFFFF" font-size="1.5">Splitter descoberto novo\PNão temos todas as emendas nem a FO que o alimenta! Sinal -11 na saida</text>
